@@ -18,59 +18,68 @@ public class Robocop extends AdvancedRobot
     */
    private byte moveDirection = 1;
 
-   private boolean moved = false; // if we need to move or turn
-   private boolean inCorner = false; // if we are in a corner
-   private String targ; // what robot to target
-   private byte spins = 0; // spin counter
-   private byte dir = 1; // direction to move
-   private short prevE; // previous energy of robot we're targeting
+   private boolean moved = false; // se precisarmos nos mover ou virar
+   private boolean inCorner = false; // se estiver nas paredes
+   private String targ; // que robô mirar
+   private byte spins = 0; // contador de giros do robô
+   private byte dir = 1; // Direção para mover
+   private short prevE; //energia anterior do robô que estamos atirando
  
    @Override
    public void run(){
-      setColors(Color.BLACK, Color.BLACK, Color.BLACK); // set the colors
-      setAdjustGunForRobotTurn(true); // when the robot turns, adjust gun in opposite dir
-      setAdjustRadarForGunTurn(true); // when the gun turns, adjust radar in opposite dir
-      while(true){ // for radar lock (aka "Narrow Lock")
-         turnRadarLeftRadians(1); // continually turn the radar left
-		 doRadar();
+      setColors(Color.BLACK, Color.BLACK, Color.BLACK); // Robocop black
+      setAdjustGunForRobotTurn(true); // quando o robô se virar, ajuste a arma na direção oposta
+      setAdjustRadarForGunTurn(true); // quando a arma gira, ajuste o radar no dir oposto
+      while(true){ // para bloqueio de radar
+         turnRadarLeftRadians(1); // continuamente gire o radar para a esquerda
+		 setTurnRadarRight(360); // Roda o radar
+		 //execute();
       }
    }
  
    @Override
-   public void onHitByBullet(HitByBulletEvent e){ // if hit buy a bullet
-      targ = e.getName(); // target the one who hit us!
+   public void onHitByBullet(HitByBulletEvent e){ 
+      /**
+	   * Se for atingido por uma bala, pegamos o atirador e setamos como alvo
+	   */
+      targ = e.getName();
    }
  
    @Override
    public void onScannedRobot(ScannedRobotEvent e){
-      if(targ == null || spins > 6){ // if we don't have a target
-         targ = e.getName(); // choose the first robot scanned
+      // se não tivermos um alvo, vamos escolher o primeiro robô escaneado
+      if(targ == null || spins > 6){ 
+         targ = e.getName();
       }
-	  doMove(e);
 	  
-      if(getDistanceRemaining() == 0 && getTurnRemaining() == 0){ // not moving or turning
+	  circularMove(e);
+	  
+      // Estratégia de tiro circular
+      if(getDistanceRemaining() == 0 && getTurnRemaining() == 0){ // não se movendo ou girando
+	  	 
+	     // Se tivermos nas paredes, verificamos se nos movemos antes
          if(inCorner){
-            if(moved){ // if last movement cycle we were moving,
+		    // Se nos movemos antes, então movemos de forma circular pra esquerda num angulo de 90 graus 
+            if(moved){
                setTurnLeft(90); // turn this cycle
                moved = false; // and move next cycle
-            }
-            else{ // else if last cycle we were turning
+            } else { // else if last cycle we were turning
                setAhead(160 * dir); // move this cycle
                moved = true; // and turn next cycle
             }
          }
          else{
-            // if we aren't going N/S go north or south
+            // se não estamos indo N / S ir para o norte ou para o sul
             if((getHeading() % 90) != 0){
                setTurnLeft((getY() > (getBattleFieldHeight() / 2)) ? getHeading()
                      : getHeading() - 180);
             }
-            // if we aren't at the top or bottom, go to whichever is closer
+            // se não estivermos no topo ou no fundo, vá para o que estiver mais perto
             else if(getY() > 30 && getY() < getBattleFieldHeight() - 30){
                setAhead(getHeading() > 90 ? getY() - 20 : getBattleFieldHeight() - getY()
                      - 20);
             }
-            // if we aren't facing toward East/West, face toward it
+            // se não estivermos voltados para leste / oeste, viramos para ele
             else if(getHeading() != 90 && getHeading() != 270){
                if(getX() < 350){
                   setTurnLeft(getY() > 300 ? 90 : -90);
@@ -79,17 +88,17 @@ public class Robocop extends AdvancedRobot
                   setTurnLeft(getY() > 300? -90 : 90);
                }
             }
-            // if we aren't at the left or right, go to whichever is closer
+            // se não estivermos à esquerda ou à direita, vá para o que estiver mais perto
             else if(getX() > 30 && getX() < getBattleFieldWidth() - 30){
                setAhead(getHeading() < 180 ? getX() - 20 : getBattleFieldWidth() - getX()
                      - 20);
             }
-            // we are in the corner; turn and start moving
+            // estamos no canto; vire e comece a se mover
             else if(getHeading() == 270){
                setTurnLeft(getY() > 200 ? 90 : 180);
                inCorner = true;
             }
-            // we are in the corner; turn and start moving
+            // estamos no canto; vire e comece a se mover
             else if(getHeading() == 90){
                setTurnLeft(getY() > 200 ? 180 : 90);
                inCorner = true;
@@ -99,53 +108,50 @@ public class Robocop extends AdvancedRobot
       if(e.getName().equals(targ)){ // if the robot scanned is our target
          spins = 0; // reset radar spin counter
  
-         // if the enemy fires, with a 15% chance, 
+         // se o inimigo disparar, com 15% de chance muda a direção 
          if((prevE < (prevE = (short)e.getEnergy())) && Math.random() > .85){
-            dir *= -1; // change direction
+            dir *= -1;
          }
- 
+ 		 
+         // Mova a arma na direção deles
          setTurnGunRightRadians(Utils.normalRelativeAngle((getHeadingRadians() + e
-               .getBearingRadians()) - getGunHeadingRadians())); // move gun toward them
- 
-         if(e.getDistance() < 200){ // the the enemy is further than 200px
-            setFire(3); // fire full power
+               .getBearingRadians()) - getGunHeadingRadians()));
+ 		 
+		 // Se o inimigo está além de 200px, atire com força máxima, se não, reduza
+		 // a força do tiro para poupar energina em caso de erro
+         if(e.getDistance() < 200){
+            setFire(3);
+         } else {
+            setFire(2.4);
          }
-         else{
-            setFire(2.4); // else fire 2.4
-         }
- 
-         double radarTurn = getHeadingRadians() + e.getBearingRadians()
-               - getRadarHeadingRadians();
-         setTurnRadarRightRadians(2 * Utils.normalRelativeAngle(radarTurn)); // lock radar
-      }
-      else if(targ != null){ // else
-         spins++; // add one to spin count
+ 		 
+         // Calcula o angulo para o radar retornar e trava o radar
+         double radarTurn = getHeadingRadians() + e.getBearingRadians() - getRadarHeadingRadians();
+         setTurnRadarRightRadians(2 * Utils.normalRelativeAngle(radarTurn));
+		 
+        // Se não tiver alvo, incrementa a variável de rotação
+      } else if(targ != null){
+         spins++;
       }
    }
-   
-
-
-
-   
-   void doRadar() {
-		// rotate the radar
-		setTurnRadarRight(360);
-	}
-
-	public void doMove(ScannedRobotEvent e) {
+    
+    // Implementação da estratégia de movimento circular com fuga de paredes
+	public void circularMove(ScannedRobotEvent e) {
 		// Sempre se posiciona contra o nosso inimigo, virando um pouco para ele
 		setTurnRight(normalizeBearing(e.getBearing() + 90 - (15 * moveDirection)));
 
 		// mudar de direção se paramos (também se afasta da parede se estiver muito perto)
 		if (getVelocity() == 0) {
-			setMaxVelocity(8);
+			setMaxVelocity(8); // muda a velocidade para 8
 			moveDirection *= -1;
 			setAhead(10000 * moveDirection);
 		}
 	}
 
 
-	// computes the absolute bearing between two points
+	// Calcula o rolamento absoluto entre dois pontos
+	// Na navegação, o rolamento absoluto é o ângulo no sentido horário entre o norte e um objeto 
+    // observado a partir do robô
 	double absoluteBearing(double x1, double y1, double x2, double y2) {
 		double xo = x2-x1;
 		double yo = y2-y1;
@@ -166,7 +172,7 @@ public class Robocop extends AdvancedRobot
 		return bearing;
 	}
 
-	// normalizes a bearing to between +180 and -180
+	// normaliza um rolamento entre +180 e -180
 	double normalizeBearing(double angle) {
 		while (angle >  180) {
 			angle -= 360;
