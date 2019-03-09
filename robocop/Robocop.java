@@ -51,8 +51,9 @@ public class Robocop extends AdvancedRobot
       if(targ == null || spins > 6){ 
          targ = e.getName();
       }
-	  
-	  circularMove(e);
+      
+      // Movimento circular com fuga de paredes	  
+      circularMove(e);
 	  
       // Estratégia de tiro circular
       if(getDistanceRemaining() == 0 && getTurnRemaining() == 0){ // não se movendo ou girando
