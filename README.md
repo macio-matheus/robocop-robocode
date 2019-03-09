@@ -6,15 +6,15 @@ Simple Robocde strategie
 
 
 #### Circular movement
-![](https://raw.githubusercontent.com/macio-matheus/robocop-robocode/master/docs/fame1.png)
+![](https://raw.githubusercontent.com/macio-matheus/robocop-robocode/master/docs/frame1.png)
 
 ---
 
-![](https://raw.githubusercontent.com/macio-matheus/robocop-robocode/master/docs/fame2.png)
+![](https://raw.githubusercontent.com/macio-matheus/robocop-robocode/master/docs/frame2.png)
 
 ---
 
-![](https://raw.githubusercontent.com/macio-matheus/robocop-robocode/master/docs/fame3.png)
+![](https://raw.githubusercontent.com/macio-matheus/robocop-robocode/master/docs/frame3.png)
 
 #### Results (30 rounds)
 
