@@ -1,5 +1,7 @@
 ### Robocop - Robocode
 
+Simple Robocde strategie
+
 ![](https://raw.githubusercontent.com/macio-matheus/robocop-robocode/master/docs/robocop-robocode.png)
 
 
