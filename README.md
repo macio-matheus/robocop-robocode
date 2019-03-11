@@ -2,6 +2,8 @@
 
 Efficient implementation of Robocode, with a combination of circular motion strategy and circular shooting strategy. The results look promising, in several rounds of 30 rounds, Robocop ranked first among all others.
 
+Presetation: https://docs.google.com/presentation/d/16OSM43gaH543kdHCmTfQmXY1Sei8KuMlICuSZyVmEuw/edit?usp=sharing
+
 ![](https://raw.githubusercontent.com/macio-matheus/robocop-robocode/master/docs/robocop-robocode.png)
 
 ----
