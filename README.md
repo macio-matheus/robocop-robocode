@@ -10,17 +10,18 @@ Efficient implementation of Robocode, with a combination of circular motion stra
 The idea of circular movement is to frame the enemy like a shark. If we lean against a wall or other obstacle, Robocop does the opposite way by calculating the angle in radians. Below, 3 frames illustrating the movement.
 
 ```java
+// Implementação da estratégia de movimento circular com fuga de paredes
 public void circularMove(ScannedRobotEvent e) {
-		// Sempre se posiciona contra o nosso inimigo, virando um pouco  		// para ele
-		setTurnRight(normalizeBearing(e.getBearing() + 90 - (15 * moveDirection)));
+	// Sempre se posiciona contra o nosso inimigo, virando um pouco para ele
+	setTurnRight(normalizeBearing(e.getBearing() + 90 - (15 * moveDirection)));
 
-		// mudar de direção se paramos (também se afasta da parede se 			// estiver muito perto)
-		if (getVelocity() == 0) {
-			setMaxVelocity(8); // muda a velocidade para 8
-			moveDirection *= -1;
-			setAhead(10000 * moveDirection);
-		}
+	// mudar de direção se paramos (também se afasta da parede se estiver muito perto)
+	if (getVelocity() == 0) {
+		setMaxVelocity(8); // muda a velocidade para 8
+		moveDirection *= -1;
+		setAhead(10000 * moveDirection);
 	}
+}
 ```
 
 ![frame 1](https://raw.githubusercontent.com/macio-matheus/robocop-robocode/master/docs/fame1.png)
@@ -44,85 +45,85 @@ To see the complete calculation step by step, see this link: http://robowiki.net
 Robocop implementation:
 
 ```java
-	 // Estratégia de tiro circular
-      if(getDistanceRemaining() == 0 && getTurnRemaining() == 0){ // não 		 //se movendo ou girando
+// Estratégia de tiro circular
+if(getDistanceRemaining() == 0 && getTurnRemaining() == 0){ // não se movendo ou girando
 
-	     // Se tivermos nas paredes, verificamos se nos movemos antes
-         if(inCorner){
-		    // Se nos movemos antes, então movemos de forma circular pra 			// esquerda num angulo de 90 graus 
-            if(moved){
-               setTurnLeft(90); // turn this cycle
-               moved = false; // and move next cycle
-            } else { // else if last cycle we were turning
-               setAhead(160 * dir); // move this cycle
-               moved = true; // and turn next cycle
-            }
-         }
-         else{
-            // se não estamos indo N / S ir para o norte ou para o sul
-            if((getHeading() % 90) != 0){
-               setTurnLeft((getY() > (getBattleFieldHeight() / 2)) ? getHeading()
-                     : getHeading() - 180);
-            }
-            // se não estivermos no topo ou no fundo, vá para o que estiver 			// mais perto
-            else if(getY() > 30 && getY() < getBattleFieldHeight() - 30){
-               setAhead(getHeading() > 90 ? getY() - 20 : getBattleFieldHeight() - getY()
-                     - 20);
-            }
-            // se não estivermos voltados para leste / oeste, viramos para ele
-            else if(getHeading() != 90 && getHeading() != 270){
-               if(getX() < 350){
-                  setTurnLeft(getY() > 300 ? 90 : -90);
-               }
-               else{
-                  setTurnLeft(getY() > 300? -90 : 90);
-               }
-            }
-            // se não estivermos à esquerda ou à direita, vá para o que 					 //estiver mais perto
-            else if(getX() > 30 && getX() < getBattleFieldWidth() - 30){
-               setAhead(getHeading() < 180 ? getX() - 20 : getBattleFieldWidth() - getX()
-                     - 20);
-            }
-            // estamos no canto; vire e comece a se mover
-            else if(getHeading() == 270){
-               setTurnLeft(getY() > 200 ? 90 : 180);
-               inCorner = true;
-            }
-            // estamos no canto; vire e comece a se mover
-            else if(getHeading() == 90){
-               setTurnLeft(getY() > 200 ? 180 : 90);
-               inCorner = true;
-            }
-         }
-      }
-      if(e.getName().equals(targ)){ // if the robot scanned is our target
-         spins = 0; // reset radar spin counter
- 
-         // se o inimigo disparar, com 15% de chance muda a direção 
-         if((prevE < (prevE = (short)e.getEnergy())) && Math.random() > .85){
-            dir *= -1;
-         }
- 		 
-         // Mova a arma na direção deles
-         setTurnGunRightRadians(Utils.normalRelativeAngle((getHeadingRadians() + e
-               .getBearingRadians()) - getGunHeadingRadians()));
- 		 
-		 // Se o inimigo está além de 200px, atire com força máxima, se 			// não, reduza
-		 // a força do tiro para poupar energina em caso de erro
-         if(e.getDistance() < 200){
-            setFire(3);
-         } else {
-            setFire(2.4);
-         }
- 		 
-         // Calcula o angulo para o radar retornar e trava o radar
-         double radarTurn = getHeadingRadians() + e.getBearingRadians() - getRadarHeadingRadians();
-         setTurnRadarRightRadians(2 * Utils.normalRelativeAngle(radarTurn));
-		 
-        // Se não tiver alvo, incrementa a variável de rotação
-      } else if(targ != null){
-         spins++;
-      }
+ // Se tivermos nas paredes, verificamos se nos movemos antes
+ if(inCorner){
+	    // Se nos movemos antes, então movemos de forma circular pra esquerda num angulo de 90 graus 
+    if(moved){
+       setTurnLeft(90); // turn this cycle
+       moved = false; // and move next cycle
+    } else { // else if last cycle we were turning
+       setAhead(160 * dir); // move this cycle
+       moved = true; // and turn next cycle
+    }
+ }
+ else{
+    // se não estamos indo N / S ir para o norte ou para o sul
+    if((getHeading() % 90) != 0){
+       setTurnLeft((getY() > (getBattleFieldHeight() / 2)) ? getHeading()
+	     : getHeading() - 180);
+    }
+    // se não estivermos no topo ou no fundo, vá para o que estiver mais perto
+    else if(getY() > 30 && getY() < getBattleFieldHeight() - 30){
+       setAhead(getHeading() > 90 ? getY() - 20 : getBattleFieldHeight() - getY()
+	     - 20);
+    }
+    // se não estivermos voltados para leste / oeste, viramos para ele
+    else if(getHeading() != 90 && getHeading() != 270){
+       if(getX() < 350){
+	  setTurnLeft(getY() > 300 ? 90 : -90);
+       }
+       else{
+	  setTurnLeft(getY() > 300? -90 : 90);
+       }
+    }
+    // se não estivermos à esquerda ou à direita, vá para o que estiver mais perto
+    else if(getX() > 30 && getX() < getBattleFieldWidth() - 30){
+       setAhead(getHeading() < 180 ? getX() - 20 : getBattleFieldWidth() - getX()
+	     - 20);
+    }
+    // estamos no canto; vire e comece a se mover
+    else if(getHeading() == 270){
+       setTurnLeft(getY() > 200 ? 90 : 180);
+       inCorner = true;
+    }
+    // estamos no canto; vire e comece a se mover
+    else if(getHeading() == 90){
+       setTurnLeft(getY() > 200 ? 180 : 90);
+       inCorner = true;
+    }
+ }
+}
+if(e.getName().equals(targ)){ // if the robot scanned is our target
+ spins = 0; // reset radar spin counter
+
+ // se o inimigo disparar, com 15% de chance muda a direção 
+ if((prevE < (prevE = (short)e.getEnergy())) && Math.random() > .85){
+    dir *= -1;
+ }
+
+ // Mova a arma na direção deles
+ setTurnGunRightRadians(Utils.normalRelativeAngle((getHeadingRadians() + e
+       .getBearingRadians()) - getGunHeadingRadians()));
+
+	 // Se o inimigo está além de 200px, atire com força máxima, se não, reduza
+	 // a força do tiro para poupar energina em caso de erro
+ if(e.getDistance() < 200){
+    setFire(3);
+ } else {
+    setFire(2.4);
+ }
+
+ // Calcula o angulo para o radar retornar e trava o radar
+ double radarTurn = getHeadingRadians() + e.getBearingRadians() - getRadarHeadingRadians();
+ setTurnRadarRightRadians(2 * Utils.normalRelativeAngle(radarTurn));
+
+// Se não tiver alvo, incrementa a variável de rotação
+} else if(targ != null){
+ spins++;
+}
 ```
 
 ### Results (30 rounds)
