@@ -23,7 +23,7 @@ public void circularMove(ScannedRobotEvent e) {
 	}
 ```
 
-![frame 1](https://raw.githubusercontent.com/macio-matheus/robocop-robocode/master/docs/frame1.png)
+![frame 1](https://raw.githubusercontent.com/macio-matheus/robocop-robocode/master/docs/fame1.png)
 
 ![frame 2](https://raw.githubusercontent.com/macio-matheus/robocop-robocode/master/docs/frame2.png)
 
